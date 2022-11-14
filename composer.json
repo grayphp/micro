@@ -1,0 +1,20 @@
+{
+    "name": "developersharif/micro",
+    "description": "PHP micro Framework.",
+    "type": "project",
+    "require-dev": {
+        "filp/whoops": "^2.14",
+        "symfony/var-dumper": "^6.1"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sharif",
+            "email": "developersharif@yahoo.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.5",
+        "phpmailer/phpmailer": "^6.6"
+    }
+}
