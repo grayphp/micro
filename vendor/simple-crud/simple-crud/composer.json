@@ -1,0 +1,49 @@
+{
+	"name": "simple-crud/simple-crud",
+	"type": "library",
+	"description": "Create/Read/Update/Delete easily",
+	"keywords": ["crud", "mysql", "sqlite"],
+	"homepage": "https://github.com/oscarotero/simple-crud",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Oscar Otero",
+			"email": "oom@oscarotero.com",
+			"homepage": "http://oscarotero.com",
+			"role": "Developer"
+		}
+	],
+	"support": {
+		"email": "oom@oscarotero.com",
+		"issues": "https://github.com/oscarotero/simple-crud/issues"
+	},
+	"require": {
+		"php": ">=7.2",
+		"atlas/pdo": "^1.1",
+		"atlas/query": "^1.2",
+		"psr/event-dispatcher": "^1.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"SimpleCrud\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"SimpleCrud\\Tests\\": "tests"
+		}
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^8.0|^9.0",
+		"friendsofphp/php-cs-fixer": "^2.11",
+		"oscarotero/php-cs-fixer-config": "^1.0",
+		"phpstan/phpstan": "^0.12.84"
+	},
+    "scripts": {
+        "test": [
+					"phpunit",
+					"phpstan analyse src tests"
+				],
+        "cs-fix": "php-cs-fixer fix ."
+    }
+}

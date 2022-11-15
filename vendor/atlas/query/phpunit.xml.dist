@@ -1,0 +1,12 @@
+<phpunit bootstrap="./phpunit.php">
+    <testsuites>
+        <testsuite name="atlas/query">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+</phpunit>

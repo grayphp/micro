@@ -22,16 +22,14 @@ class ComposerAutoloaderInitd854577436042480ad3d66dc11c675bd
             return self::$loader;
         }
 
-        require __DIR__ . '/platform_check.php';
-
-        spl_autoload_register(array('ComposerAutoloaderInitd854577436042480ad3d66dc11c675bd', 'loadClassLoader'), true, true);
+        spl_autoload_register(array('ComposerAutoloaderInitd854577436042480ad3d66dc11c675bd', 'loadClassLoader'), true, false);
         self::$loader = $loader = new \Composer\Autoload\ClassLoader(\dirname(__DIR__));
         spl_autoload_unregister(array('ComposerAutoloaderInitd854577436042480ad3d66dc11c675bd', 'loadClassLoader'));
 
         require __DIR__ . '/autoload_static.php';
         call_user_func(\Composer\Autoload\ComposerStaticInitd854577436042480ad3d66dc11c675bd::getInitializer($loader));
 
-        $loader->register(true);
+        $loader->register(false);
 
         $includeFiles = \Composer\Autoload\ComposerStaticInitd854577436042480ad3d66dc11c675bd::$files;
         foreach ($includeFiles as $fileIdentifier => $file) {
