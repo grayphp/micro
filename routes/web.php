@@ -1,6 +1,6 @@
 <?php
 
-use app\web\router\Route;
+use system\router\Route;
 use app\web\controller\WelcomeController;
 
-Route::get('/', WelcomeController::class, 'index');
+Route::get('/', WelcomeController::class);

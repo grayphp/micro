@@ -7,6 +7,6 @@ class WelcomeController
 
     public function index()
     {
-        return view('welcome', ['name' => 'shariful islam']);
+        return view('welcome');
     }
 }

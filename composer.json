@@ -4,12 +4,12 @@
     "type": "project",
     "autoload": {
         "files": [
-            "database/database.php",
-            "app/helper/global.php"
+            "system/helper/global.php"
         ],
         "psr-4": {
+            "system\\": "system/",
+            "config\\": "config/",
             "app\\": "app/",
-            "db\\": "database/",
             "helper\\": "app/helper/"
         }
     },

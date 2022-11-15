@@ -13,6 +13,5 @@ return array(
     'a1105708a18b76903365ca1c4aa61b02' => $vendorDir . '/symfony/translation/Resources/functions.php',
     'ec07570ca5a812141189b1fa81503674' => $vendorDir . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     '667aeda72477189d0494fecd327c3641' => $vendorDir . '/symfony/var-dumper/Resources/functions/dump.php',
-    'e1936158314ad9f3da68d969e021342d' => $baseDir . '/database/database.php',
-    '10166ac4d67c28f99fe59b58861428c8' => $baseDir . '/app/helper/global.php',
+    '3a54e7dc7a8332a36c5f70dffb3ab1d9' => $baseDir . '/system/helper/global.php',
 );

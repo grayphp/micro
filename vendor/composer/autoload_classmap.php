@@ -1319,5 +1319,6 @@ return array(
     'Whoops\\Util\\SystemFacade' => $vendorDir . '/filp/whoops/src/Whoops/Util/SystemFacade.php',
     'Whoops\\Util\\TemplateHelper' => $vendorDir . '/filp/whoops/src/Whoops/Util/TemplateHelper.php',
     'app\\web\\controller\\WelcomeController' => $baseDir . '/app/web/controller/WelcomeController.php',
-    'app\\web\\router\\Route' => $baseDir . '/app/web/router/Route.php',
+    'system\\database\\Database' => $baseDir . '/system/database/Database.php',
+    'system\\router\\Route' => $baseDir . '/system/router/Route.php',
 );

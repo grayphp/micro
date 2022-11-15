@@ -14,18 +14,21 @@ class ComposerStaticInitd854577436042480ad3d66dc11c675bd
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
-        'e1936158314ad9f3da68d969e021342d' => __DIR__ . '/../..' . '/database/database.php',
-        '10166ac4d67c28f99fe59b58861428c8' => __DIR__ . '/../..' . '/app/helper/global.php',
+        '3a54e7dc7a8332a36c5f70dffb3ab1d9' => __DIR__ . '/../..' . '/system/helper/global.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        's' => 
+        array (
+            'system\\' => 7,
+        ),
         'h' => 
         array (
             'helper\\' => 7,
         ),
-        'd' => 
+        'c' => 
         array (
-            'db\\' => 3,
+            'config\\' => 7,
         ),
         'a' => 
         array (
@@ -76,13 +79,17 @@ class ComposerStaticInitd854577436042480ad3d66dc11c675bd
     );
 
     public static $prefixDirsPsr4 = array (
+        'system\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/system',
+        ),
         'helper\\' => 
         array (
             0 => __DIR__ . '/../..' . '/app/helper',
         ),
-        'db\\' => 
+        'config\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/database',
+            0 => __DIR__ . '/../..' . '/config',
         ),
         'app\\' => 
         array (
@@ -1488,7 +1495,8 @@ class ComposerStaticInitd854577436042480ad3d66dc11c675bd
         'Whoops\\Util\\SystemFacade' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Util/SystemFacade.php',
         'Whoops\\Util\\TemplateHelper' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Util/TemplateHelper.php',
         'app\\web\\controller\\WelcomeController' => __DIR__ . '/../..' . '/app/web/controller/WelcomeController.php',
-        'app\\web\\router\\Route' => __DIR__ . '/../..' . '/app/web/router/Route.php',
+        'system\\database\\Database' => __DIR__ . '/../..' . '/system/database/Database.php',
+        'system\\router\\Route' => __DIR__ . '/../..' . '/system/router/Route.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

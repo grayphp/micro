@@ -3,7 +3,7 @@
         'name' => 'developersharif/micro',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'fb1128426f149a5bf17ea88c8fb44318852b8638',
+        'reference' => '26c8eb6e949b02dceed5f85769684362c766b665',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'developersharif/micro' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'fb1128426f149a5bf17ea88c8fb44318852b8638',
+            'reference' => '26c8eb6e949b02dceed5f85769684362c766b665',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
