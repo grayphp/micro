@@ -3,7 +3,7 @@
         'name' => 'developersharif/micro',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '26c8eb6e949b02dceed5f85769684362c766b665',
+        'reference' => '01b2d73cab19039710a5b0b1d6eaa852b522ed93',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'developersharif/micro' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '26c8eb6e949b02dceed5f85769684362c766b665',
+            'reference' => '01b2d73cab19039710a5b0b1d6eaa852b522ed93',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -411,15 +411,6 @@
             'provided' => array(
                 0 => '2.3|3.0',
             ),
-        ),
-        'symfony/var-dumper' => array(
-            'pretty_version' => 'v6.1.6',
-            'version' => '6.1.6.0',
-            'reference' => '0f0adde127f24548e23cbde83bcaeadc491c551f',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../symfony/var-dumper',
-            'aliases' => array(),
-            'dev_requirement' => false,
         ),
         'theseer/tokenizer' => array(
             'pretty_version' => '1.2.1',

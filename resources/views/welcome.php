@@ -1,1 +1,3 @@
-welcome page!
+<?php
+echo "<pre>";
+var_dump($user);

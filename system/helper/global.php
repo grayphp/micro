@@ -4,6 +4,19 @@ define('APP_ROOT', __DIR__ . '/../../');
 define('VIEWS_PATH', APP_ROOT . 'resources/views/');
 define('DATABASE_PATH', APP_ROOT . '/database/');
 /* --------------------------------Global Helper Functions-------------------------------- */
+function config($target = 'app', $key = 'null')
+{
+    $data = require APP_ROOT . "config/{$target}.php";
+    if (isset($data[$key])) {
+        return $data[$key];
+    } else {
+        throw new Exception("Key:($key) Not Found", 1);
+    }
+}
+function DB()
+{
+    return (new \system\database\Database())->connection;
+}
 function out($text)
 {
     echo htmlspecialchars($text);

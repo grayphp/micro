@@ -31,7 +31,6 @@
 	},
     "require": {
         "simple-crud/simple-crud": "^7.5",
-        "symfony/var-dumper": "^6.1",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "vlucas/phpdotenv": "^5.5",
