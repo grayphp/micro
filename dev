@@ -1,1 +1,9 @@
-<?php system('php -S localhost:4000 -t public');
+#!/usr/bin/env php
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
+
+use system\console\boot as console;
+
+define('BOOT_START', microtime(true));
+//system('php -S localhost:4000 -t public');
+(new console($argv));
