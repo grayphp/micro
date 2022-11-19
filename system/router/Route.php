@@ -2,54 +2,68 @@
 
 namespace system\router;
 
-class Route
+abstract class Route
 {
     static function view($route, $view, $data = [])
     {
         self::view_route($route, $view, $data);
     }
 
-    static function get($route, $controller, $method = 'index')
+    static function get($route, $controller)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            self::route($route, $controller, $method);
+            self::route($route, $controller);
         }
     }
-    static function post($route, $controller, $method = 'index')
+    static function post($route, $controller)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_csrf_valid()) {
-            self::route($route, $controller, $method);
+            self::route($route, $controller);
         }
     }
-    static function put($route, $controller, $method = 'index')
+    static function put($route, $controller)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-            self::route($route, $controller, $method);
+            self::route($route, $controller);
         }
     }
-    static function patch($route, $controller, $method = 'index')
+    static function patch($route, $controller)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
-            self::route($route, $controller, $method);
+            self::route($route, $controller);
         }
     }
-    static function delete($route, $controller, $method = 'index')
+    static function delete($route, $controller)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            self::route($route, $controller, $method);
+            self::route($route, $controller);
         }
     }
-    static function any($route, $controller, $method = null)
+    static function any($route, $controller)
     {
 
-        self::route($route, $controller, $method);
+        self::route($route, $controller);
     }
 
-    static function route($route, $controller, $method = 'index')
+    static function route($route, $controllers)
     {
-        $callback = $controller;
+        if (is_array($controllers)) {
+            if (is_assoc($controllers)) {
+                $method = (isset($controllers[0])) ? $controllers[0] : 'index';
+                $controller = $controllers['controller'];
+                $middleware = (isset($controllers['middleware'])) ? $controllers['middleware'] : null;
+            } else {
+                $controller = $controllers[0];
+                $method =  (isset($controllers[1])) ? $controllers[1] : 'index';
+            }
+        } else {
+            $callback = $controllers;
+        }
+        $callback = (isset($callback)) ? $callback : null;
+
+
         if ($route == "/404") {
-            $file = VIEWS_PATH . "/$controller.php";
+            $file = VIEWS_PATH . "/$controllers.php";
             if (file_exists($file)) {
                 include $file;
             } else {
@@ -88,6 +102,11 @@ class Route
         if (is_callable($callback)) {
             call_user_func_array($callback, $parameters);
             exit();
+        }
+        // Controller function
+        if ($middleware) {
+            $middleware = new $middleware;
+            $middleware->handle();
         }
         call_user_func_array([new $controller, $method], $parameters);
         exit();

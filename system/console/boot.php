@@ -46,15 +46,10 @@ class boot
     }
     function makeController($name)
     {
+        print("Controller {$name} created successfully\n");
         $file = ucfirst($name);
-        $content = "<?php\n\nnamespace app\web\controller;\n\nclass {$file}\n{\n\tfunction __construct()\n\t{\n\t\t# code...\n\t}\n}";
-        // $file = fopen("../../app/web/controller/{$file}.php", "w");
-        // fwrite($file, $content);
-        // fclose($file);
-        $fp = fopen(APP_ROOT . "web/controller/{$file}.php", "wb");
-        fwrite($fp, $content);
-        fclose($fp);
-        // file_put_contents("../../app/web/controller/{$file}.php", $content);
+        $content = "<?php\n\nnamespace app\web\controller;\n\nclass {$file}\n{\n\tfunction index()\n\t{\n\t\t# code...\n\t}\n}";
+        file_put_contents(__DIR__ . "/../../app/web/controller/{$file}.php", $content);
         echo "Controller created successfully\n";
     }
 }
