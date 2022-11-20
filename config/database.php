@@ -3,7 +3,7 @@
 namespace config;
 
 return [
-    'default' => env('DB_CONNECTION', 'mysql'), // default connection mysql
+    'default' => env('DB_CONNECTION', 'sqlite'), // default connection mysql
     'connections' => [
 
         'sqlite' => [
