@@ -104,7 +104,7 @@ abstract class Route
             exit();
         }
         // Controller function
-        if ($middleware) {
+        if (isset($middleware)) {
             $middleware = new $middleware;
             $middleware->handle();
         }
