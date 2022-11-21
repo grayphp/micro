@@ -17,6 +17,10 @@ function DB()
 {
     return (new \system\database\Database())->connection;
 }
+function SQL()
+{
+    return (new \system\database\Database())->sql;
+}
 function out($text)
 {
     echo htmlspecialchars($text);

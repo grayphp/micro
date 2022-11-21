@@ -8,6 +8,7 @@ define("SQLITE_PATH", DATABASE_PATH . "/database.sqlite");
 class Driver
 {
     public $connection;
+    public $sql;
     function __construct()
     {
 
@@ -21,6 +22,7 @@ class Driver
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
             ));
             $this->connection = new Database($pdo);
+            $this->sql = $pdo;
         } catch (\Exception $e) {
             $file = $e->getFile();
             $line = $e->getLine();

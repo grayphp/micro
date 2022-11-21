@@ -9,6 +9,7 @@ class Mysql
 
     private $credentials;
     public $connection;
+    public $sql;
     public function __construct()
     {
         $this->credentials = config('database', 'connections')['mysql'];
@@ -16,6 +17,7 @@ class Mysql
             $dsn = "mysql:host={$this->credentials['host']};dbname={$this->credentials['database']};port={$this->credentials['port']};charset={$this->credentials['charset']}";
             $pdo = new \PDO($dsn, $this->credentials['username'], $this->credentials['password']);
             $this->connection = new Database($pdo);
+            $this->sql = $pdo;
         } catch (\Throwable $e) {
             $file = $e->getFile();
             $line = $e->getLine();
