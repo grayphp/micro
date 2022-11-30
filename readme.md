@@ -4,7 +4,7 @@ Micro is a framework for creating web applications. It has a simple, easy to und
 
 ## Installation
 
-Install with composer
+Install via composer
 
 ```bash
  composer create-project grayphp/micro my-app
