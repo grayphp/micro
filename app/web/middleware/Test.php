@@ -6,6 +6,5 @@ class Test
 {
     public function handle()
     {
-        echo 'Middleware executed successfully';
     }
 }
