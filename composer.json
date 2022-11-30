@@ -1,5 +1,5 @@
 {
-    "name": "developersharif/micro",
+    "name": "grayphp/micro",
     "description": "PHP micro Framework.",
     "type": "project",
     "autoload": {
