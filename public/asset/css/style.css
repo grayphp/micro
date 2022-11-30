@@ -3,3 +3,26 @@
     padding: 0;
     box-sizing: border-box;
 }
+body {
+    height: 100vh;
+    background: linear-gradient(to right, white 0%, white 50%, black 0%, black 50%);
+  }
+  
+  h1 {
+    color: white;
+    white-space: nowrap;
+    font-size: 5rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  h1::before {
+    content: attr(data-heading);
+    position: absolute;
+    left: 0;
+    color: black;
+    width: 50%;
+    overflow: hidden;
+  }
