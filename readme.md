@@ -38,7 +38,7 @@ Route::method('/path',callback);
 ### Dynamic Route
 
 ```php
-Route::get('user/$id',function($id)){
+Route::get('/user/$id',function($id)){
     print $id;
 }
 
