@@ -24,7 +24,7 @@ http://localhost:4000
 #### Abailable Routes:
 
 ```
-[get,post,patch,put,any]
+[get,post,patch,put,delete,any]
 ```
 
 ### Route
