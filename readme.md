@@ -34,6 +34,10 @@ use system\router\Route;
 Route::get('/path',[controller::class,'method']);
 Route::method('/path',callback);
 ```
+### Middleware
+```php
+Route::any('/profile', ['controller' => HomeController::class, 'profile', 'middleware' => UserAuth::class]);
+```
 
 ### Dynamic Route
 
@@ -50,6 +54,13 @@ Route::get('/user/$id',function($id)){
 
 ```cli
 php dev -c MyController
+```
+## Middleware
+
+### Make Middleware
+
+```cli
+php dev -m MyMiddleware
 ```
 
 ## Database
