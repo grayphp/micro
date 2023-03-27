@@ -1,6 +1,6 @@
 # PHP Micro Framework
 
-Micro is a framework for creating web applications. It has a simple, easy to understand syntax.
+Think big, code small with Micro - the PHP micro framework for web applications.
 
 ## Installation
 
