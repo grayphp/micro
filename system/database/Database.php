@@ -1,34 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace system\database;
 
-use system\database\drivers\sqlite\Driver;
+use SimpleCrud\Database as SimpleCrudDatabase;
 use system\database\drivers\mysql\Mysql;
+use system\database\drivers\sqlite\Driver;
 
-class Database
+/**
+ * Database factory — singleton per request.
+ *
+ * Access via the DB() / SQL() helpers rather than instantiating directly.
+ *
+ * @property-read SimpleCrudDatabase $connection  SimpleCrud ORM connection
+ * @property-read \PDO               $sql          Raw PDO connection
+ */
+final class Database
 {
-    public $connection;
-    public $sql;
-    function __construct()
+    public readonly SimpleCrudDatabase $connection;
+    public readonly \PDO $sql;
+
+    private static ?self $instance = null;
+
+    private function __construct()
     {
         $driver = config('database', 'default');
-        try {
-            switch ($driver) {
-                case 'sqlite':
-                    $this->connection = (new Driver())->connection;
-                    $this->sql = (new Driver())->sql;
-                    break;
-                case 'mysql':
-                    $this->connection = (new Mysql())->connection;
-                    $this->sql = (new Mysql())->sql;
-                    break;
-                default:
-                    $this->connection = (new Mysql())->connection;
-                    $this->sql = (new Mysql())->sql;
-                    break;
-            }
-        } catch (\Throwable $th) {
-            print $th;
+
+        $driverInstance = match ($driver) {
+            'sqlite' => new Driver(),
+            default  => new Mysql(),
+        };
+
+        $this->connection = $driverInstance->connection;
+        $this->sql        = $driverInstance->sql;
+    }
+
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
         }
+
+        return self::$instance;
     }
 }

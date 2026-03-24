@@ -1,15 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\web\controller;
 
 use system\controller\Controller;
 
 class WelcomeController extends Controller
 {
-
-
-    public function index()
+    public function index(): void
     {
-        //return view('welcome');
+        $this->view('welcome');
     }
 }

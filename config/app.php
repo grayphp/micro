@@ -1,8 +1,13 @@
 <?php
 
-namespace config;
+declare(strict_types=1);
 
-/*** Under Development ***/
 return [
-    'name' => env('APP_NAME', 'Micro Framework'),
+    'name'     => env('APP_NAME', 'Micro Framework'),
+    'env'      => env('APP_ENV', 'production'),
+    'debug'    => env('APP_DEBUG', false),
+    'url'      => env('APP_URL', 'http://localhost'),
+    'timezone' => env('TIME_ZONE', 'UTC'),
+    'locale'   => env('APP_LOCALE', 'en'),
+    'charset'  => 'UTF-8',
 ];

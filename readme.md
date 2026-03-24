@@ -1,409 +1,220 @@
-# PHP Micro Framework
+# Micro — PHP Micro Framework
 
-Micro is a framework for creating web applications. It has a simple, easy to understand syntax.
+A lightweight, expressive PHP micro-framework for building web applications with clean **PHP 8.2+** syntax.  No magic, no bloat — just a router, controllers, views, and a database ORM working together cleanly.
+
+---
+
+## Requirements
+
+- **PHP 8.2+**
+- Composer
+- `ext-mbstring`, `ext-openssl`, `ext-pdo`
+
+---
 
 ## Installation
 
-Install via composer
+```bash
+composer create-project grayphp/micro my-app
+cd my-app
+cp .env.example .env
+```
+
+Edit `.env` with your app settings, then start the development server:
 
 ```bash
- composer create-project grayphp/micro my-app
- cd my-app
+php dev serve          # http://localhost:4000
+php dev serve 8080     # http://localhost:8080
 ```
 
-```
-php dev start
-```
+---
+
+## Directory Structure
 
 ```
-http://localhost:4000
+my-app/
+├── app/
+│   └── web/
+│       ├── controller/     # Application controllers
+│       └── middleware/     # Request middleware
+├── boot/
+│   └── bootstrap.php       # Application bootstrap
+├── config/
+│   ├── app.php             # App configuration
+│   └── database.php        # Database configuration
+├── docs/                   # Full documentation
+├── public/
+│   └── index.php           # Web entry point
+├── resources/
+│   └── views/              # PHP view templates
+├── routes/
+│   └── web.php             # Route definitions
+├── storage/
+│   └── logs/               # Error logs (production)
+├── system/                 # Framework core (do not modify)
+│   ├── console/            # CLI commands
+│   ├── controller/         # Base controller
+│   ├── database/           # Database drivers
+│   ├── exception/          # HTTP exception classes
+│   ├── helper/             # Global helper functions
+│   ├── http/               # Request / Response classes
+│   └── router/             # Router
+├── .env                    # Local environment (gitignored)
+├── .env.example            # Template for .env
+└── composer.json
 ```
 
-## Usage/Examples
+---
 
-#### Abailable Routes:
+## Quick Start
 
-```
-[get,post,patch,put,any]
-```
-
-### Route
+### 1. Define Routes (`routes/web.php`)
 
 ```php
 use system\router\Route;
-Route::get('/path',[controller::class,'method']);
-Route::method('/path',callback);
+
+// Closure route
+Route::get('/', fn() => view('welcome'));
+
+// Controller route
+Route::get('/posts',     [PostController::class, 'index']);
+Route::get('/posts/$id', [PostController::class, 'show'], name: 'post.show');
+Route::post('/posts',    [PostController::class, 'store']);
+
+// Dynamic segments
+Route::get('/users/$id/posts/$slug', function (string $id, string $slug): void {
+    out("User {$id} → Post: {$slug}");
+});
+
+// Route groups with middleware
+Route::group('/admin', function (): void {
+    Route::get('/dashboard', [AdminController::class, 'dashboard']);
+}, middleware: [AuthMiddleware::class]);
+
+// View shorthand
+Route::view('/about', 'about');
+
+// Redirect
+Route::redirect('/old', '/new');
 ```
 
-### Dynamic Route
+### 2. Create a Controller
 
-```php
-Route::get('/user/$id',function($id)){
-    print $id;
-}
-
-```
-
-## controller
-
-### Make controller
-
-```cli
-php dev -c MyController
-```
-
-## Database
-
-Your can access to Database using DB() helper.
-
-### Basic CRUD:
-
-You can interact directly with the tables to insert/update/delete/select data:
-
-Use `ArrayAccess` interface to access to the data using the `id`:
-
-## DB instance
-
-```php
-$db = DB();
+```bash
+php dev make:controller PostController
 ```
 
 ```php
-//Get the post id = 3;
-$post = $db->post[3];
-//Check if a row exists
-if (isset($db->post[3])) {
-    echo 'exists';
-}
-//Delete a post
-unset($db->post[3]);
-//Update a post
-$db->post[3] = [
-    'title' => 'Hello world'
-];
-//Insert a new post
-$db->post[] = [
-    'title' => 'Hello world 2'
-];
-//Tables implements the Countable interface
-$totalPost = count($db->post);
-```
+<?php
 
-### Select by other fields
+declare(strict_types=1);
 
-If you want to select a row by other key than `id`, just use the method `get`:
+namespace app\web\controller;
 
-```php
-$post = $db->post->get(['slug' => 'post-slug']);
-```
+use system\controller\Controller;
 
-### Select or create
+class PostController extends Controller
+{
+    public function index(): void
+    {
+        $posts = DB()->post->select()->orderBy('created_at DESC')->limit(10)->get();
+        $this->view('posts.index', compact('posts'));
+    }
 
-Sometimes, you want to get a row or create it if it does not exist. You can do it easily with `getOrCreate` method:
+    public function show(string $id): void
+    {
+        $post = DB()->post[(int) $id];
 
-```php
-$post = $db->post->getOrCreate(['slug' => 'post-slug']);
-```
+        if ($post === null) {
+            $this->abort(404);
+        }
 
-### Rows
+        $this->view('posts.show', compact('post'));
+    }
 
-A `Row` object represents a database row and is used to read and modify its data:
+    public function store(): void
+    {
+        $errors = $this->request()->validate([
+            'title' => 'required|max:200',
+            'body'  => 'required',
+        ]);
 
-```php
-//get a row by id
-$post = $db->post[34];
-//Get/modify fields values
-echo $post->title;
-$post->title = 'New title';
-//Update the row into database
-$post->save();
-//Remove the row in the database
-$post->delete();
-//Create a new row
-$newPost = $db->post->create(['title' => 'The title']);
-//Insert the row in the database
-$newPost->save();
-```
+        if ($errors) {
+            $this->json(['errors' => $errors], 422);
+        }
 
-### Queries
-
-A `Query` object represents a database query. SimpleCrud uses magic methods to create queries. For example `$db->post->select()` returns a new instance of a `Select` query in the tabe `post`. Other examples: `$db->comment->update()`, `$db->category->delete()`, etc... Each query has modifiers like `orderBy()`, `limit()`:
-
-```php
-//Create an UPDATE query with the table post
-$updateQuery = $db->post->update(['title' => 'New title']);
-//Add conditions, limit, etc
-$updateQuery
-    ->where('id = ', 23)
-    ->limit(1);
-//get the query as string
-echo $updateQuery; //UPDATE `post` ...
-//execute the query and returns a PDOStatement with the result
-$PDOStatement = $updateQuery();
-```
-
-The method `get()` executes the query and returns the processed result of the query. For example, with `insert()` returns the id of the new row:
-
-```php
-//insert a new post
-$id = $db->post
-    ->insert([
-        'title' => 'My first post',
-        'text' => 'This is the text of the post'
-    ])
-    ->get();
-//Delete a post
-$db->post
-    ->delete()
-    ->where('id = ', 23)
-    ->get();
-//Count all posts
-$total = $db->post
-    ->selectAggregate('COUNT')
-    ->get();
-//note: this is the same like count($db->post)
-//Sum the ids of all posts
-$total = $db->post
-    ->selectAggregate('SUM', 'id')
-    ->get();
-```
-
-`select()->get()` returns an instance of `RowCollection` with the result:
-
-```php
-$posts = $db->post
-    ->select()
-    ->where('id > ', 10)
-    ->orderBy('id ASC')
-    ->limit(100)
-    ->get();
-foreach ($posts as $post) {
-    echo $post->title;
+        DB()->post[] = $this->request()->only(['title', 'body']);
+        $this->redirect('/posts');
+    }
 }
 ```
 
-If you only need the first row, use the modifier `one()`:
+### 3. Create a View (`resources/views/posts/index.php`)
 
-```php
-$post = $db->post
-    ->select()
-    ->one()
-    ->where('id = ', 23)
-    ->get();
-echo $post->title;
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?= e(config('app', 'name')) ?></title>
+</head>
+<body>
+    <h1>Posts</h1>
+    <?php foreach ($posts as $post): ?>
+        <article>
+            <h2><a href="<?= e(url('post.show', ['id' => $post->id])) ?>"><?= e($post->title) ?></a></h2>
+        </article>
+    <?php endforeach; ?>
+</body>
+</html>
 ```
 
-`select()` has some interesting modifiers like `relatedWith()` to add automatically the `WHERE` clauses needed to select data related with other row or rowCollection:
+---
 
-```php
-//Get the post id = 23
-$post = $db->post[23];
-//Select the category related with this post
-$category = $db->category
-    ->select()
-    ->relatedWith($post)
-    ->one()
-    ->get();
-```
+## Documentation
 
-### Query API:
+| Topic | File |
+|-------|------|
+| Routing | [docs/routing.md](docs/routing.md) |
+| Controllers | [docs/controllers.md](docs/controllers.md) |
+| Request & Response | [docs/request-response.md](docs/request-response.md) |
+| Database | [docs/database.md](docs/database.md) |
+| Middleware | [docs/middleware.md](docs/middleware.md) |
+| Helper Functions | [docs/helpers.md](docs/helpers.md) |
+| CLI Commands | [docs/cli.md](docs/cli.md) |
+| Configuration | [docs/configuration.md](docs/configuration.md) |
 
-Queries use [Atlas.Query](http://atlasphp.io/cassini/query/) library to build the final queries, so you can see the documentation for all available options.
+---
 
-#### Select / SelectAggregate
+## Key Features
 
-| Function                                             | Description                                                                   |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `one`                                                | Select 1 result.                                                              |
-| `relatedWith(Row / RowCollection / Table $relation)` | To select rows related with other rows or tables (relation added in `WHERE`). |
-| `joinRelation(Table $table)`                         | To add a related table as `LEFT JOIN`.                                        |
-| `getPageInfo()`                                      | Returns the info of the pagination.                                           |
-| `from`                                               | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `columns`                                            | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `join`                                               | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `catJoin`                                            | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `groupBy`                                            | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `having`                                             | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `orHaving`                                           | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `orderBy`                                            | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `catHaving`                                          | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `where`                                              | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `whereSprintf`                                       | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `catWhere`                                           | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `orWhere`                                            | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `orWhereSprintf`                                     | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `whereEquals`                                        | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `limit`                                              | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `offset`                                             | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `distinct`                                           | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `forUpdate`                                          | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `setFlag`                                            | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
-| `bindValue`                                          | [Atlas.Query Select()](http://atlasphp.io/cassini/query/select.html)          |
+| Feature | Details |
+|---------|---------|
+| **PHP 8.2+** | `readonly` properties, `match`, named arguments, `declare(strict_types=1)` everywhere |
+| **Router** | GET / POST / PUT / PATCH / DELETE / ANY, dynamic segments, named routes, groups, redirects, view shortcuts |
+| **Controller** | Base class with `view()`, `json()`, `redirect()`, `abort()`, `request()` |
+| **Request** | Immutable value object — input, headers, JSON body, validation, IP, bearer token |
+| **Response** | `json()`, `redirect()`, `abort()`, `download()`, security headers |
+| **Database** | SimpleCrud ORM (PDO-backed), singleton connection, MySQL + SQLite drivers |
+| **CSRF** | `hash_equals()` comparison, POST/header token, `set_csrf()` / `csrf_token()` helpers |
+| **Middleware** | Per-route and per-group, array-ordered stack |
+| **Method Spoofing** | `_method` POST field for PUT / PATCH / DELETE from HTML forms |
+| **Flash** | One-request session flash messages |
+| **Error Handling** | Whoops in debug mode; structured logging + friendly error pages in production |
+| **Security Headers** | Automatic on every response |
+| **CLI** | `serve`, `make:controller`, `make:middleware` scaffolding commands |
 
-#### Update
+---
 
-| Function                                             | Description                                                                   |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `relatedWith(Row / RowCollection / Table $relation)` | To update rows related with other rows or tables (relation added in `WHERE`). |
-| `set`                                                | [Atlas.Query Update()](http://atlasphp.io/cassini/query/update.html)          |
-| `setFlag`                                            | [Atlas.Query Update()](http://atlasphp.io/cassini/query/update.html)          |
-| `where`                                              | [Atlas.Query Update()](http://atlasphp.io/cassini/query/update.html)          |
-| `orWhere`                                            | [Atlas.Query Update()](http://atlasphp.io/cassini/query/update.html)          |
-| `catWhere`                                           | [Atlas.Query Update()](http://atlasphp.io/cassini/query/update.html)          |
-| `orderBy`                                            | [Atlas.Query Update()](http://atlasphp.io/cassini/query/update.html)          |
-| `limit`                                              | [Atlas.Query Update()](http://atlasphp.io/cassini/query/update.html)          |
-| `offset`                                             | [Atlas.Query Update()](http://atlasphp.io/cassini/query/update.html)          |
+## Security
 
-#### Insert
+- **CSRF tokens** — compared with `hash_equals()` (timing-safe)
+- **Output escaping** — `e()` / `out()` use `htmlspecialchars` with `ENT_QUOTES | ENT_SUBSTITUTE`
+- **Database** — PDO with `ERRMODE_EXCEPTION` and prepared statements via SimpleCrud
+- **Security headers** — sent on every response
+- **Debug mode off** — errors logged, never displayed in production
 
-| Function     | Description                                                                      |
-| ------------ | -------------------------------------------------------------------------------- |
-| `orIgnore()` | To ignore silently the insertion on duplicated keys, instead throw an exception. |
-| `set`        | [Atlas.Query Insert()](http://atlasphp.io/cassini/query/insert.html)             |
-| `setFlag`    | [Atlas.Query Insert()](http://atlasphp.io/cassini/query/insert.html)             |
+---
 
-#### Delete
+## License
 
-| Function                                             | Description                                                                   |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `relatedWith(Row / RowCollection / Table $relation)` | To delete rows related with other rows or tables (relation added in `WHERE`). |
-| `setFlag`                                            | [Atlas.Query Delete()](http://atlasphp.io/cassini/query/delete.html)          |
-| `where`                                              | [Atlas.Query Delete()](http://atlasphp.io/cassini/query/delete.html)          |
-| `orWhere`                                            | [Atlas.Query Delete()](http://atlasphp.io/cassini/query/delete.html)          |
-| `catWhere`                                           | [Atlas.Query Delete()](http://atlasphp.io/cassini/query/delete.html)          |
-| `orderBy`                                            | [Atlas.Query Delete()](http://atlasphp.io/cassini/query/delete.html)          |
-| `limit`                                              | [Atlas.Query Delete()](http://atlasphp.io/cassini/query/delete.html)          |
-| `offset`                                             | [Atlas.Query Delete()](http://atlasphp.io/cassini/query/delete.html)          |
-
-### Lazy loads
-
-Both `Row` and `RowCollection` can load automatically other related rows. Just use a property named as related table. For example:
-
-```php
-//Get the category id=34
-$category = $db->category[34];
-//Load the posts of this category
-$posts = $category->post;
-//This is equivalent to:
-$posts = $db->post
-    ->select()
-    ->relatedWith($category)
-    ->get();
-//But the result is cached so the database query is executed only the first time
-$posts = $category->post;
-```
-
-This allows make things like this:
-
-```php
-$titles = $db->post[34]->tag->post->title;
-//Get the post id=34
-//Get the tags of the post
-//Then the posts related with these tags
-//And finally, the titles of all these posts
-```
-
-Use magic methods to get a `Select` query returning related rows:
-
-```php
-$category = $db->category[34];
-//Magic property: Returns all posts of this category:
-$posts = $category->post;
-//Magic method: Returns the query instead the result
-$posts = $category->post()
-    ->where('pubdate > ', date('Y-m-d'))
-    ->limit(10)
-    ->get();
-```
-
-### Solving the n+1 problem
-
-The [n+1 problem](http://stackoverflow.com/questions/97197/what-is-the-n1-selects-issue) can be solved in the following way:
-
-```php
-//Get some posts
-$posts = $db->post
-    ->select()
-    ->get();
-//preload all categories
-$posts->category;
-//now you can iterate with the posts
-foreach ($posts as $post) {
-    echo $post->category;
-}
-```
-
-You can perform the select by yourself to include modifiers:
-
-```php
-//Get some posts
-$posts = $db->post
-    ->select()
-    ->get();
-//Select the categories but ordered alphabetically descendent
-$categories = $posts->category()
-    ->orderBy('name DESC')
-    ->get();
-//Save the result in the cache and link the categories with each post
-$posts->link($categories);
-//now you can iterate with the posts
-foreach ($posts as $post) {
-    echo $post->category;
-}
-```
-
-For many-to-many relations, you need to do one more step:
-
-```php
-//Get some posts
-$posts = $db->post
-    ->select()
-    ->get();
-//Select the post_tag relations
-$tagRelations = $posts->post_tag()->get();
-//And now the tags of these relations
-$tags = $tagRelations->tag()
-    ->orderBy('name DESC')
-    ->get();
-//Link the tags with posts using the relations
-$posts->link($tags, $tagRelations);
-//now you can iterate with the posts
-foreach ($posts as $post) {
-    echo $post->tag;
-}
-```
-
-### Relate and unrelate data
-
-To save related rows in the database, you need to do this:
-
-```php
-//Get a comment
-$comment = $db->comment[5];
-//Get a post
-$post = $db->post[34];
-//Relate
-$post->relate($comment);
-//Unrelate
-$post->unrelate($comment);
-//Unrelate all comments of the post
-$post->unrelateAll($db->comment);
-```
-
-### Pagination
-
-The `select` query has a special modifier to paginate the results:
-
-```php
-$query = $db->post->select()
-    ->page(1)
-    ->perPage(50);
-$posts = $query->get();
-//To get the page info:
-$pagination = $query->getPageInfo();
-echo $pagination['totalRows']; //125
-echo $pagination['totalPages']; //3
-echo $pagination['currentPage']; //1
-echo $pagination['previousPage']; //NULL
-echo $pagination['nextPage']; //2
-```
+MIT © [Sharif](https://github.com/grayphp)

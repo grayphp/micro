@@ -1,35 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace system\database\drivers\sqlite;
 
+use PDO;
 use SimpleCrud\Database;
 
-define("SQLITE_PATH", DATABASE_PATH . "/database.sqlite");
-class Driver
+/**
+ * SQLite driver.
+ *
+ * Creates the database file and its parent directory if they do not exist.
+ * Throws a \PDOException on connection failure — caught by the global handler.
+ */
+final class Driver
 {
-    public $connection;
-    public $sql;
-    function __construct()
-    {
+    public readonly Database $connection;
+    public readonly PDO $sql;
 
-        try {
-            if (!file_exists(SQLITE_PATH)) {
-                touch(SQLITE_PATH);
-            }
-            $pdo = new \PDO('sqlite:' . SQLITE_PATH, '', '', array(
-                \PDO::ATTR_EMULATE_PREPARES => false,
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
-            ));
-            $this->connection = new Database($pdo);
-            $this->sql = $pdo;
-        } catch (\Exception $e) {
-            $file = $e->getFile();
-            $line = $e->getLine();
-            $msg = $e->getMessage();
-            $etime = date('d/M/Y(h:i a)');
-            $error = "<b>Error: </b>" . $msg . "<b> file: </b>" . $file . "<b> line: </b>" . $line . " <b>date: </b>" . $etime;
-            exit("<center>database not connected!{$error}</center>");
+    public function __construct()
+    {
+        $path = $this->resolvePath();
+
+        $this->ensureDirectoryExists($path);
+
+        $pdo = new PDO('sqlite:' . $path, options: [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]);
+
+        $this->connection = new Database($pdo);
+        $this->sql        = $pdo;
+    }
+
+    private function resolvePath(): string
+    {
+        $configured = config('database', 'connections')['sqlite']['database'] ?? '';
+
+        return $configured !== '' ? $configured : DATABASE_PATH . 'database.sqlite';
+    }
+
+    private function ensureDirectoryExists(string $path): void
+    {
+        $dir = dirname($path);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
         }
     }
 }

@@ -1,22 +1,8 @@
 {
     "name": "grayphp/micro",
-    "description": "PHP micro Framework.",
+    "description": "A lightweight, production-grade PHP micro framework.",
+    "keywords": ["php", "framework", "micro", "router", "mvc"],
     "type": "project",
-    "autoload": {
-        "files": [
-            "system/helper/global.php"
-        ],
-        "psr-4": {
-            "system\\": "system/",
-            "config\\": "config/",
-            "app\\": "app/",
-            "helper\\": "app/helper/"
-        }
-    },
-    "require-dev": {
-        "filp/whoops": "^2.14",
-        "phpunit/phpunit": "^9.5.8"
-    },
     "license": "MIT",
     "authors": [
         {
@@ -24,18 +10,41 @@
             "email": "developersharif@yahoo.com"
         }
     ],
-    "config": {
-		"optimize-autoloader": true,
-		"prepend-autoloader": false,
-        "platform-check": false
-	},
     "require": {
-        "simple-crud/simple-crud": "^7.5",
+        "php": ">=8.2",
         "ext-mbstring": "*",
         "ext-openssl": "*",
+        "ext-pdo": "*",
+        "simple-crud/simple-crud": "^7.5",
         "vlucas/phpdotenv": "^5.5",
         "phpmailer/phpmailer": "^6.6",
-        "nesbot/carbon": "^2.62.1",
-        "psr/simple-cache": "^1.0|^2.0|^3.0"
-    }
+        "nesbot/carbon": "^3.0|^2.72",
+        "psr/simple-cache": "^3.0"
+    },
+    "require-dev": {
+        "filp/whoops": "^2.15",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "files": [
+            "system/helper/global.php"
+        ],
+        "psr-4": {
+            "system\\": "system/",
+            "config\\": "config/",
+            "app\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

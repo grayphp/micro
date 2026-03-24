@@ -1,5 +1,9 @@
-/vendor
+/vendor/
 .env
 .phpunit.result.cache
-/.vscode
-.composer.lock
+/.vscode/
+/.idea/
+composer.lock
+/storage/logs/*.log
+/database/*.sqlite
+*.DS_Store

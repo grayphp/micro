@@ -1,30 +1,58 @@
 <?php
 
+declare(strict_types=1);
+
 namespace system\database\drivers\mysql;
 
+use PDO;
 use SimpleCrud\Database;
 
-class Mysql
+/**
+ * MySQL / MariaDB driver.
+ *
+ * Reads connection details from config('database', 'connections')['mysql'].
+ * Throws a \PDOException on connection failure — caught by the global handler.
+ */
+final class Mysql
 {
+    public readonly Database $connection;
+    public readonly PDO $sql;
 
-    private $credentials;
-    public $connection;
-    public $sql;
     public function __construct()
     {
-        $this->credentials = config('database', 'connections')['mysql'];
-        try {
-            $dsn = "mysql:host={$this->credentials['host']};dbname={$this->credentials['database']};port={$this->credentials['port']};charset={$this->credentials['charset']}";
-            $pdo = new \PDO($dsn, $this->credentials['username'], $this->credentials['password']);
-            $this->connection = new Database($pdo);
-            $this->sql = $pdo;
-        } catch (\Throwable $e) {
-            $file = $e->getFile();
-            $line = $e->getLine();
-            $msg = $e->getMessage();
-            $etime = date('d/M/Y(h:i a)');
-            $error = "<b>Error: </b>" . $msg . "<b> file: </b>" . $file . "<b> line: </b>" . $line . " <b>date: </b>" . $etime;
-            exit("<center>database not connected!{$error}</center>");
+        /** @var array{host: string, port: string, database: string, username: string, password: string, charset: string, unix_socket: string} $cfg */
+        $cfg = config('database', 'connections')['mysql'];
+
+        $dsn = $this->buildDsn($cfg);
+
+        $pdo = new PDO($dsn, $cfg['username'], $cfg['password'], [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]);
+
+        $this->connection = new Database($pdo);
+        $this->sql        = $pdo;
+    }
+
+    /** @param array<string, string> $cfg */
+    private function buildDsn(array $cfg): string
+    {
+        if (!empty($cfg['unix_socket'])) {
+            return sprintf(
+                'mysql:unix_socket=%s;dbname=%s;charset=%s',
+                $cfg['unix_socket'],
+                $cfg['database'],
+                $cfg['charset'],
+            );
         }
+
+        return sprintf(
+            'mysql:host=%s;port=%s;dbname=%s;charset=%s',
+            $cfg['host'],
+            $cfg['port'],
+            $cfg['database'],
+            $cfg['charset'],
+        );
     }
 }
